@@ -40,6 +40,7 @@
         function init() {
           // Find the canvas element.
           canvaso = document.getElementById("imageView");
+          // canvas = document.getElementById("imageView");
           if (!canvaso) {
             alert("Error: I cannot find the canvas element!");
             return;
@@ -79,6 +80,95 @@
 
           context = canvas.getContext("2d");
 
+          // undo redo functionality
+          var history = {
+            redo_list: [],
+            undo_list: [],
+
+            saveState: function (canvas, list, keep_redo) {
+              keep_redo = keep_redo || false;
+              if (!keep_redo) {
+                this.redo_list = [];
+              }
+              console.log("this.undo_list", this.undo_list, list);
+              (list || this.undo_list).push(canvas.toDataURL());
+            },
+            undo: function (canvas, ctx) {
+              console.log("undoin history", this.undo_list, this.redo_list);
+              this.restoreState(canvas, ctx, this.undo_list, this.redo_list);
+            },
+            redo: function (canvas, ctx) {
+              console.log("redoin history", this.redo_list, this.undo_list);
+              this.restoreState(canvas, ctx, this.redo_list, this.undo_list);
+            },
+            restoreState: function (canvas, ctx, pop, push) {
+              if (pop.length) {
+                this.saveState(canvas, push, true);
+                var restore_state = pop.pop();
+                var img = new Element("img", { src: restore_state });
+                img.onload = function () {
+                  ctx.clearRect(0, 0, canvas.width, canvas.height);
+                  ctx.drawImage(
+                    img,
+                    0,
+                    0,
+                    canvas.width,
+                    canvas.height,
+                    0,
+                    0,
+                    canvas.width,
+                    canvas.height
+                  );
+                };
+              }
+            },
+          };
+
+          var pencil = {
+            options: {
+              stroke_color: ["00", "00", "00"],
+              dim: 4,
+            },
+            init: function (canvas, ctx) {
+              console.log("pencil init", canvas, ctx);
+              this.canvas = canvas;
+              this.canvas_coords = this.canvas.getCoordinates();
+              this.ctx = ctx;
+              this.ctx.strokeColor = this.options.stroke_color;
+              this.drawing = false;
+              this.addCanvasEvents();
+            },
+            addCanvasEvents: function () {
+              this.canvas.addEvent("mousedown", this.start.bind(this));
+              this.canvas.addEvent("mousemove", this.stroke.bind(this));
+              this.canvas.addEvent("mouseup", this.stop.bind(this));
+              this.canvas.addEvent("mouseout", this.stop.bind(this));
+            },
+            start: function (evt) {
+              var x = evt.page.x - this.canvas_coords.left;
+              var y = evt.page.y - this.canvas_coords.top;
+              console.log("x and y in start", x, y);
+              this.ctx.beginPath();
+              this.ctx.moveTo(x, y);
+              console.log("start canvas", this.canvas);
+              history.saveState(this.canvas);
+              this.drawing = true;
+            },
+            stroke: function (evt) {
+              if (this.drawing) {
+                var x = evt.page.x - this.canvas_coords.left;
+                var y = evt.page.y - this.canvas_coords.top;
+                console.log("stroke x and y", x, y);
+                this.ctx.lineTo(x, y);
+                this.ctx.stroke();
+              }
+            },
+            stop: function (evt) {
+              if (this.drawing) this.drawing = false;
+            },
+          };
+          // ended undo redo
+
           // Get the tool select input.
           // var tool_select = document.getElementById('dtool');
           var tool_select = document.getElementById("pencil-button");
@@ -89,17 +179,17 @@
           colorPicked = $("#colour-picker").val();
           $(".color-click").css("background-color", colorPicked);
           $("#colour-picker").change(function () {
-            if(bg_color){
+            if (bg_color) {
               channel.push("background_color", {
                 room: room,
                 name: "background_color",
                 data: {
-                  color: $("#colour-picker").val()
+                  color: $("#colour-picker").val(),
                 },
               });
-            }else{
-            colorPicked = $("#colour-picker").val();
-            $(".color-click").css("background-color", colorPicked);
+            } else {
+              colorPicked = $("#colour-picker").val();
+              $(".color-click").css("background-color", colorPicked);
             }
           });
 
@@ -155,33 +245,39 @@
             if (tools[pick.value]) {
               tool = new tools[pick.value]();
             }
-            if(pick.value != 'bgcolor'){
+            if (pick.value != "bgcolor") {
               bg_color = false;
-           }
+            }
           }
 
           $("#pencil-button").click(function () {
+            pencil.init(canvas, contexto);
             pic_tool_click(this);
           });
 
           $("#rect-button").click(function () {
-            console.log("clicked rect");
+            pencil.init(canvas, contexto);
+
             pic_tool_click(this);
           });
 
           $("#circle-button").click(function () {
+            pencil.init(canvas, contexto);
             pic_tool_click(this);
           });
 
           $("#ellipse-button").click(function () {
+            pencil.init(canvas, contexto);
             pic_tool_click(this);
           });
 
           $("#line-button").click(function () {
+            pencil.init(canvas, contexto);
             pic_tool_click(this);
           });
 
           $("#text-button").click(function () {
+            pencil.init(canvas, contexto);
             pic_tool_click(this);
           });
 
@@ -190,6 +286,15 @@
             bg_color = true;
           });
 
+          $("#undo").click(function () {
+        
+            history.undo(canvaso, contexto);
+          });
+
+          $("#redo").click(function () {
+      
+            history.redo(canvaso, contexto);
+          });
           //Draw Grids
           function SketchGrid(gridSize) {
             context.clearRect(0, 0, canvas.width, canvas.height);
@@ -263,7 +368,7 @@
               // console.log(cpos, "canvas");
               var user_id = $("#user-id").val();
 
-               channel.push("mousemove", { user: user_id, cpos: cpos });
+              channel.push("mousemove", { user: user_id, cpos: cpos });
             },
             false
           );
@@ -472,8 +577,8 @@
 
         channel.on("rectangle", onDrawRect);
 
-        function backgroundColor(data){ 
-          $("#imageView").css("background-color",data.color)
+        function backgroundColor(data) {
+          $("#imageView").css("background-color", data.color);
         }
         channel.on("background_color", backgroundColor);
 

@@ -15,5 +15,14 @@
     "ejs": "^3.1.3",
     "express": "^4.17.1",
     "express-fileupload": "^1.1.7-alpha.4"
-  }
+  },
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/raviteja-soulpage/libero-ui-1.git"
+  },
+  "bugs": {
+    "url": "https://github.com/raviteja-soulpage/libero-ui-1/issues"
+  },
+  "homepage": "https://github.com/raviteja-soulpage/libero-ui-1#readme"
 }

@@ -15,6 +15,7 @@
       integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
       crossorigin="anonymous"
     />
+    <script src="https://ajax.googleapis.com/ajax/libs/mootools/1.4.5/mootools-yui-compressed.js"></script>
     <style>
       #container {
         position: relative;
@@ -118,6 +119,22 @@
           style="background-color: #ececec; border-radius: 10px;"
         >
           <div class="justify-content-between d-sm-flex">
+            <div
+              id="controllers"
+              style="
+                width: 600px;
+                font-size: 0.8em;
+                color: #333;
+                display: inline-block;
+                background: #eee;
+                border: 1px solid #e7e7e7;
+                padding: 5px;
+              "
+            >
+              <span class="controller" id="undo">undo</span>
+              <span class="controller" id="redo">redo</span>
+            </div>
+
             <button
               class="btn btn-sm border-0 bg-transparent"
               id="pencil-button"
@@ -171,11 +188,21 @@
               <span class="d-block mt-2">Clear All</span>
             </button>
             <div class="bg_color_div btn-div my-auto cstm-font">
-              <button class="btn btn-sm border-0 bg-transparent bg_color" id="bg_color" value="bgcolor">
-                <img src="/icons/fill-color.png" width="23px" height="23px" alt="bg" class="d-block mx-auto" />
+              <button
+                class="btn btn-sm border-0 bg-transparent bg_color"
+                id="bg_color"
+                value="bgcolor"
+              >
+                <img
+                  src="/icons/fill-color.png"
+                  width="23px"
+                  height="23px"
+                  alt="bg"
+                  class="d-block mx-auto"
+                />
                 <span class="d-block mt-2">bg color</span>
               </button>
-              </div>
+            </div>
             <span class="my-auto cstm-font">
               <button
                 class="btn rounded-circle color-click"
@@ -184,7 +211,7 @@
               <input type="color" name="" id="colour-picker" hidden />
               <span class="d-block for-color mt-1">Color</span>
             </span>
-            
+
             <span class="my-auto text-center cstm-font"
               ><input
                 type="number"
