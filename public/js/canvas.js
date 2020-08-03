@@ -40,7 +40,7 @@
         function init() {
           // Find the canvas element.
           canvaso = document.getElementById("imageView");
-          // canvas = document.getElementById("imageView");
+          canvas = document.getElementById("imageView");  // #1
           if (!canvaso) {
             alert("Error: I cannot find the canvas element!");
             return;
@@ -59,8 +59,8 @@
           }
 
           // Add the temporary canvas.
-          var container = canvaso.parentNode;
-          canvas = document.createElement("canvas");
+          // var container = canvaso.parentNode;
+          // canvas = document.createElement("canvas");
           if (!canvas) {
             alert("Error: I cannot create a new canvas element!");
             return;
@@ -73,12 +73,12 @@
             canvaso.height = window.innerHeight - 200;
           }
 
-          canvas.id = "imageTemp";
-          canvas.width = canvaso.width;
-          canvas.height = canvaso.height;
-          container.appendChild(canvas);
+          // canvas.id = "imageTemp";
+          // canvas.width = canvaso.width;
+          // canvas.height = canvaso.height;
+          // container.appendChild(canvas);
 
-          context = canvas.getContext("2d");
+          // context = canvas.getContext("2d");
 
           // undo redo functionality
           var history = {
@@ -106,6 +106,7 @@
                 this.saveState(canvas, push, true);
                 var restore_state = pop.pop();
                 var img = new Element("img", { src: restore_state });
+
                 img.onload = function () {
                   ctx.clearRect(0, 0, canvas.width, canvas.height);
                   ctx.drawImage(
@@ -130,7 +131,7 @@
               dim: 4,
             },
             init: function (canvas, ctx) {
-              console.log("pencil init", canvas, ctx);
+              alert("yes");
               this.canvas = canvas;
               this.canvas_coords = this.canvas.getCoordinates();
               this.ctx = ctx;
@@ -251,6 +252,7 @@
           }
 
           $("#pencil-button").click(function () {
+            console.log("ctx pencil", contexto);
             pencil.init(canvas, contexto);
             pic_tool_click(this);
           });
@@ -287,12 +289,12 @@
           });
 
           $("#undo").click(function () {
-        
+            console.log("ctx undo`", contexto);
             history.undo(canvaso, contexto);
           });
 
           $("#redo").click(function () {
-      
+            console.log("ctx redo`", contexto);
             history.redo(canvaso, contexto);
           });
           //Draw Grids
